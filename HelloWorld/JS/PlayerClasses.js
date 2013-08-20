@@ -1,4 +1,5 @@
-﻿var eSex = {
+﻿// deprecated enums:
+var eSex = {
     Female: 0,
     Male: 1
 };
@@ -14,6 +15,7 @@ var eClass = {
     Wizard: 3,
     Thief: 4
 };
+
 
 function Player() {
     this.Name = "PLAYER";
@@ -36,3 +38,4 @@ function Player() {
 
     this.nRun = 5;
 }
+

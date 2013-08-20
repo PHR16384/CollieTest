@@ -2,6 +2,9 @@
 
 @font-face {
     font-family: "Quasi";
+    font-weight: normal;
+    font-style: normal;
+    font-variant: normal;
     src: url("../Font/quasimodo.ttf") format('truetype');
 }
 
