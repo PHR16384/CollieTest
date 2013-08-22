@@ -138,7 +138,7 @@ var oBtnNewGame = new collie.Text({
     y: 88,
     width: 320,
     height: 48,
-    padding: "4 0 4 0",
+    padding: "6 0 0 0",
     backgroundColor: "rgba(255,255,192,0.6)",
     textAlign: "center",
     fontFamily: "Quasi",
@@ -257,7 +257,9 @@ function timerDone() {
 }
 
 function showCredits(e) {
-    collie.Renderer.removeLayer(TitleText);
+    collie.Renderer.removeAllLayer();
+    collie.Renderer.addLayer(BG);
+    collie.Renderer.addLayer(TitleScreen);
     collie.Renderer.addLayer(Credits);
 }
 
