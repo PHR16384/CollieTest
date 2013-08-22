@@ -73,7 +73,8 @@ var oLoadText = new collie.Text({
     textAlign: "center",
     fontFamily: "Quasi",
     fontColor: "rgb(64,32,0)",
-    fontSize: 64
+    fontSize: 64,
+    padding: "64 0 0 0"
 }).text("Loading . . .").addTo(Layer1);
 
 collie.Timer.cycle(oYoshi, 750, {
@@ -95,7 +96,8 @@ var oTitle = new collie.Text({
     //textBaseline: "alphabetic",
     fontFamily: "Quasi",
     fontColor: "rgb(64,32,0)",
-    fontSize: 108
+    fontSize: 108,
+    padding: "96 0 0 0"
 }).text("Munchkin").addTo(TitleScreen);
 
 var oSubtitle = new collie.Text({
@@ -106,7 +108,8 @@ var oSubtitle = new collie.Text({
     fontFamily: "Quasi",
     fontColor: "rgb(64,32,0)",
     fontStyle: "italic",
-    fontSize: 18
+    fontSize: 18,
+    padding: "18 0 0 0"
 }).text("Kill the Monsters * Steal the Treasure * Stab Your Buddy").addTo(TitleScreen);
 
 var oMunchkin = new collie.DisplayObject({
@@ -130,7 +133,8 @@ var oCopyright = new collie.Text({
     fontFamily: "Quasi",
     fontColor: "rgb(64,32,0)",
     fontWeight: "bold",
-    fontSize: 16
+    fontSize: 16,
+    padding: "16 0 0 0"
 }).text("(c)2013 [Dev. Group Name Here]").addTo(TitleText);
 
 var oBtnNewGame = new collie.Text({
@@ -138,12 +142,12 @@ var oBtnNewGame = new collie.Text({
     y: 88,
     width: 320,
     height: 48,
-    padding: "6 0 0 0",
     backgroundColor: "rgba(255,255,192,0.6)",
     textAlign: "center",
     fontFamily: "Quasi",
     fontColor: "rgb(64,32,0)",
-    fontSize: 40
+    fontSize: 40,
+    padding: "40 0 0 0"
 }).text("New Game")
     .addTo(TitleText);
 
@@ -165,7 +169,8 @@ var oCredit = new collie.Text({
     textAlign: "center",
     fontFamily: "Quasi",
     fontColor: "rgb(64,32,0)",
-    fontSize: 20
+    fontSize: 20,
+    padding: "20 0 0 0"
 }).text("Original Game Design by").addTo(Credits);
 
 var oCreditA1 = new collie.Text({
@@ -176,7 +181,8 @@ var oCreditA1 = new collie.Text({
     fontFamily: "Quasi",
     fontColor: "rgb(64,32,0)",
     fontWeight: "bold",
-    fontSize: 32
+    fontSize: 32,
+    padding: "32 0 0 0"
 }).text("Steve Jackson").addTo(oCredit);
 
 var oCreditB = new collie.Text({
@@ -186,7 +192,8 @@ var oCreditB = new collie.Text({
     textAlign: "center",
     fontFamily: "Quasi",
     fontColor: "rgb(64,32,0)",
-    fontSize: 20
+    fontSize: 20,
+    padding: "20 0 0 0"
 }).text("Illustrations by").addTo(oCredit);
 
 // "clone()" duplicates the attributes of an object.  I can use this to copypasta relative positioning attr., to "stack" text objects:
@@ -199,7 +206,8 @@ var oCreditC = new collie.Text({
     textAlign: "center",
     fontFamily: "Quasi",
     fontColor: "rgb(64,32,0)",
-    fontSize: 20
+    fontSize: 20,
+    padding: "20 0 0 0"
 }).text("JavaScript Port designed + coded by").addTo(oCredit);
 
 var oCreditC1 = oCreditB1.clone().text("Dustin Duffy").addTo(oCreditC);
@@ -212,7 +220,8 @@ var oCreditC2 = new collie.Text({
     fontFamily: "Quasi",
     fontColor: "rgb(64,32,0)",
     fontWeight: "bold",
-    fontSize: 32
+    fontSize: 32,
+    padding: "32 0 0 0"
 }).text("Tom Kruk").addTo(oCreditC1);
 
 var oCreditC3 = oCreditC2.clone().text("John Prinz").addTo(oCreditC2);
@@ -226,7 +235,8 @@ var oBtnMainMenu = new collie.Text({
     textAlign: "center",
     fontFamily: "Quasi",
     fontColor: "rgb(64,32,0)",
-    fontSize: 40
+    fontSize: 40,
+    padding: "40 0 0 0"
 }).text("Main Menu")
     .attach({
         "click": showMainMenu
@@ -242,7 +252,7 @@ collie.Renderer.addLayer(Layer1);
 collie.Renderer.load(document.getElementById("hw"));
 collie.Renderer.start("30fps");
 
-var tTimer = setInterval(timerDone, 250);
+var tTimer = setInterval(timerDone, 600);
 
 function timerDone() {
     //alert("Timer done.");
@@ -255,6 +265,7 @@ function timerDone() {
     
     clearInterval(tTimer);
 }
+
 
 function showCredits(e) {
     collie.Renderer.removeAllLayer();
@@ -269,3 +280,4 @@ function showMainMenu(e) {
     collie.Renderer.addLayer(TitleScreen);
     collie.Renderer.addLayer(TitleText);
 }
+
