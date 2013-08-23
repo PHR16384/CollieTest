@@ -1,38 +1,44 @@
-document.writeln(navigator.userAgent);
+//document.writeln(navigator.userAgent);
+$("#DEBUG").prepend("<p />" + navigator.userAgent);
 
 var W = 720;
 var H = 540;
 
-var BG = new collie.Layer({ width: W, height: H });
 var Layer1 = new collie.Layer({ width: W, height: H });
-var TitleScreen = new collie.Layer({ width: W, height: H });
+var BG = Layer1.clone();
+var TitleScreen = Layer1.clone();
 
 var TitleText = new collie.Layer({
     x: W / 2,
-    y: 144,
+    y: 112,
     width: W / 2,
-    height: 456
+    height: 480
 });
 
 var Credits = new collie.Layer({
-    x: W / 3,
+    x: W * 0.4,
     y: 160,
-    width: 2*W/3,
+    width: W * 0.6,
     height: 360
 });
+
+var Rules = Credits.clone();
+
+var GameBoard = Layer1.clone();
 
 
 collie.ImageManager.add({
     //logo: "http://jindo.dev.naver.com/collie/img/small/logo.png",
-    ground: "./ground.png",
-    Mario: "./smb_mario_sheet.png",
-    Yoshi: "./yoshi_walk.png",
-    Paper: "./paperBG1.jpg",
-    Munchkin: "./super_munchkin.png"
+    ground: "./Images/ground.png",
+    //Mario: "./Images/smb_mario_sheet.png",
+    Yoshi: "./Images/yoshi_walk.png",
+    Paper: "./Images/paperBG1.jpg",
+    Munchkin: "./Images/super_munchkin.png",
+    DA_RULES: "./Images/Da-yellow-rules.jpg"
 });
 
 
-var oBGPaper = new collie.DisplayObject({
+var imgBGPaper = new collie.DisplayObject({
     x: "center",
     y: "center",
     width: W,
@@ -43,7 +49,7 @@ var oBGPaper = new collie.DisplayObject({
 
 // Layer1
 
-var oGround = new collie.DisplayObject({
+var imgGround = new collie.DisplayObject({
     x: 0,
     y: "bottom",
     width: W * 2,
@@ -56,7 +62,7 @@ var oGround = new collie.DisplayObject({
 });
     //.addTo(Layer1);
 
-var oYoshi = new collie.MovableObject({
+var imgYoshi = new collie.MovableObject({
     x: "center",
     y: "bottom",
     width: 50,
@@ -66,7 +72,7 @@ var oYoshi = new collie.MovableObject({
 });
     //.addTo(Layer1);
 
-var oLoadText = new collie.Text({
+var txtLoading = new collie.Text({
     x: "center",
     y: "center",
     width: 400,
@@ -77,7 +83,7 @@ var oLoadText = new collie.Text({
     padding: "64 0 0 0"
 }).text("Loading . . .").addTo(Layer1);
 
-collie.Timer.cycle(oYoshi, 750, {
+collie.Timer.cycle(imgYoshi, 750, {
     from: 0,
     to: 8,
     loop: 0
@@ -87,7 +93,7 @@ collie.Timer.cycle(oYoshi, 750, {
 
 // Title Screen
 
-var oTitle = new collie.Text({
+var txtTitle = new collie.Text({
     x: "center",
     y: 0,
     width: W,
@@ -100,7 +106,18 @@ var oTitle = new collie.Text({
     padding: "96 0 0 0"
 }).text("Munchkin").addTo(TitleScreen);
 
-var oSubtitle = new collie.Text({
+var txtTM = new collie.Text({
+    x: "right",
+    y: 12,
+    width: 76,
+    fontFamily: "serif",
+    fontColor: "rgb(64,32,0)",
+    fontWeight: "bold",
+    fontSize: 12,
+    padding: "12 0 0 0"
+}).text("TM").addTo(txtTitle);    // \u00AE
+
+var txtSubtitle = new collie.Text({
     x: "center",
     y: 108,
     width: W,
@@ -112,7 +129,7 @@ var oSubtitle = new collie.Text({
     padding: "18 0 0 0"
 }).text("Kill the Monsters * Steal the Treasure * Stab Your Buddy").addTo(TitleScreen);
 
-var oMunchkin = new collie.DisplayObject({
+var imgMunchkin = new collie.DisplayObject({
     x: -8,
     y: 112,
     width: 360,
@@ -126,20 +143,23 @@ var oMunchkin = new collie.DisplayObject({
 
 // Title Text/Buttons:
 
-var oCopyright = new collie.Text({
+var txtCopyright = new collie.Text({
     x: "right",
     y: "bottom",
     width: 320,
+    //textAlign: "right",
     fontFamily: "Quasi",
     fontColor: "rgb(64,32,0)",
     fontWeight: "bold",
     fontSize: 16,
     padding: "16 0 0 0"
-}).text("(c)2013 [Dev. Group Name Here]").addTo(TitleText);
+}).text("\u00A92013 [Dev. Group Name Here]").addTo(TitleText);
 
-var oBtnNewGame = new collie.Text({
-    x: 0,
-    y: 88,
+var nBTN_V_MM = 72; //NOTE: cannot "stack" items w/ events listeners; events will bubble along parent/child tree
+
+var btnNewGame = new collie.Text({
+    //x: 0,
+    y: nBTN_V_MM,
     width: 320,
     height: 48,
     backgroundColor: "rgba(255,255,192,0.6)",
@@ -147,23 +167,71 @@ var oBtnNewGame = new collie.Text({
     fontFamily: "Quasi",
     fontColor: "rgb(64,32,0)",
     fontSize: 40,
-    padding: "40 0 0 0"
-}).text("New Game")
+    padding: "38 0 0 0"
+})
+    .text("New Game")
+    .attach({
+        "click": showGameBoard
+    })
     .addTo(TitleText);
 
-var oBtnJoinGame = oBtnNewGame.clone().text("Join Game").addTo(oBtnNewGame);
-var oBtnCredits = oBtnNewGame.clone().text("Credits")
+var btnJoinGame = new collie.Text({
+    //x: 0,
+    y: nBTN_V_MM * 2,
+    width: 320,
+    height: 48,
+    backgroundColor: "rgba(255,255,192,0.6)",
+    textAlign: "center",
+    fontFamily: "Quasi",
+    fontColor: "rgb(64,32,0)",
+    fontSize: 40,
+    padding: "38 0 0 0"
+})
+    .text("Join Game")
+    .addTo(TitleText);
+
+var btnRules = new collie.Text({
+    //x: 0,
+    y: nBTN_V_MM * 3,
+    width: 320,
+    height: 48,
+    backgroundColor: "rgba(255,255,192,0.6)",
+    textAlign: "center",
+    fontFamily: "Quasi",
+    fontColor: "rgb(64,32,0)",
+    fontSize: 40,
+    padding: "38 0 0 0"
+})
+    .text("Rules")
+    .attach({
+        "click": showRules
+    })
+    .addTo(TitleText);
+
+var btnCredits = new collie.Text({
+    //x: 0,
+    y: nBTN_V_MM * 4,
+    width: 320,
+    height: 48,
+    backgroundColor: "rgba(255,255,192,0.6)",
+    textAlign: "center",
+    fontFamily: "Quasi",
+    fontColor: "rgb(64,32,0)",
+    fontSize: 40,
+    padding: "38 0 0 0"
+})
+    .text("Credits")
     .attach({
         "click": showCredits
     })
-    .addTo(oBtnJoinGame);
+    .addTo(TitleText);
 //
 
 
 // Credits
 
-var oCredit = new collie.Text({
-    x: 0,
+var txtCredit = new collie.Text({
+    x: "center",
     y: 0,
     width: 480,
     textAlign: "center",
@@ -173,7 +241,7 @@ var oCredit = new collie.Text({
     padding: "20 0 0 0"
 }).text("Original Game Design by").addTo(Credits);
 
-var oCreditA1 = new collie.Text({
+var txtCreditA1 = new collie.Text({
     x: 0,
     y: 24,
     width: 480,
@@ -183,9 +251,9 @@ var oCreditA1 = new collie.Text({
     fontWeight: "bold",
     fontSize: 32,
     padding: "32 0 0 0"
-}).text("Steve Jackson").addTo(oCredit);
+}).text("Steve Jackson").addTo(txtCredit);
 
-var oCreditB = new collie.Text({
+var txtCreditB = new collie.Text({
     x: 0,
     y: 80,
     width: 480,
@@ -194,12 +262,12 @@ var oCreditB = new collie.Text({
     fontColor: "rgb(64,32,0)",
     fontSize: 20,
     padding: "20 0 0 0"
-}).text("Illustrations by").addTo(oCredit);
+}).text("Illustrations by").addTo(txtCredit);
 
 // "clone()" duplicates the attributes of an object.  I can use this to copypasta relative positioning attr., to "stack" text objects:
-var oCreditB1 = oCreditA1.clone().text("John Kovalic").addTo(oCreditB);
+var txtCreditB1 = txtCreditA1.clone().text("John Kovalic").addTo(txtCreditB);
 
-var oCreditC = new collie.Text({
+var txtCreditC = new collie.Text({
     x: 0,
     y: 160,
     width: 480,
@@ -208,13 +276,13 @@ var oCreditC = new collie.Text({
     fontColor: "rgb(64,32,0)",
     fontSize: 20,
     padding: "20 0 0 0"
-}).text("JavaScript Port designed + coded by").addTo(oCredit);
+}).text("JavaScript Port designed + coded by").addTo(txtCredit);
 
-var oCreditC1 = oCreditB1.clone().text("Dustin Duffy").addTo(oCreditC);
+var txtCreditC1 = txtCreditB1.clone().text("Dustin Duffy").addTo(txtCreditC);
 
-var oCreditC2 = new collie.Text({
+var txtCreditC2 = new collie.Text({
     x: 0,
-    y: 32,
+    y: 36,
     width: 480,
     textAlign: "center",
     fontFamily: "Quasi",
@@ -222,11 +290,11 @@ var oCreditC2 = new collie.Text({
     fontWeight: "bold",
     fontSize: 32,
     padding: "32 0 0 0"
-}).text("Tom Kruk").addTo(oCreditC1);
+}).text("Tom Kruk").addTo(txtCreditC1);
 
-var oCreditC3 = oCreditC2.clone().text("John Prinz").addTo(oCreditC2);
+var txtCreditC3 = txtCreditC2.clone().text("John Prinz").addTo(txtCreditC2);
 
-var oBtnMainMenu = new collie.Text({
+var btnMainMenu = new collie.Text({
     x: "center",
     y: "bottom",
     width: 320,
@@ -236,12 +304,32 @@ var oBtnMainMenu = new collie.Text({
     fontFamily: "Quasi",
     fontColor: "rgb(64,32,0)",
     fontSize: 40,
-    padding: "40 0 0 0"
+    padding: "38 0 0 0"
 }).text("Main Menu")
     .attach({
         "click": showMainMenu
     })
     .addTo(Credits);
+//
+
+
+// DA RULES.
+
+var imgRULES = new collie.DisplayObject({
+    x: "center",
+    width: 347,
+    height: 266,
+    backgroundImage: "DA_RULES"
+}).addTo(Rules);
+
+var btnMainMenu2 = btnMainMenu.clone()
+    .text("Main Menu")
+    //.detachAll()
+    .attach({
+        "click": showMainMenu
+    })
+    .addTo(Rules);
+
 //
 
 
@@ -260,24 +348,33 @@ function timerDone() {
     collie.Renderer.addLayer(TitleScreen);
     collie.Renderer.addLayer(TitleText);
     
-    //oTitle._oDrawing._oContext.textBaseline = "top";
-    console.log(oTitle._oDrawing._oContext.textBaseline);
+    //txtTitle._oDrawing._oContext.textBaseline = "top";
+    console.log(txtTitle._oDrawing._oContext.textBaseline);
     
     clearInterval(tTimer);
 }
 
-
-function showCredits(e) {
-    collie.Renderer.removeAllLayer();
-    collie.Renderer.addLayer(BG);
-    collie.Renderer.addLayer(TitleScreen);
-    collie.Renderer.addLayer(Credits);
-}
 
 function showMainMenu(e) {
     collie.Renderer.removeAllLayer();
     collie.Renderer.addLayer(BG);
     collie.Renderer.addLayer(TitleScreen);
     collie.Renderer.addLayer(TitleText);
+}
+
+function showCredits(e) {
+    collie.Renderer.removeLayer(TitleText);
+    collie.Renderer.addLayer(Credits);
+}
+
+function showRules(e) {
+    collie.Renderer.removeLayer(TitleText);
+    collie.Renderer.addLayer(Rules);
+}
+
+function showGameBoard(e) {
+    collie.Renderer.removeAllLayer();
+    collie.Renderer.addLayer(BG);
+    collie.Renderer.addLayer(GameBoard);
 }
 
