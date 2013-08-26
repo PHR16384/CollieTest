@@ -7,27 +7,36 @@ var eEquip = {
     Wep_Big: 5
 };
 
+var Card_Door = Class.extend({
+    init: function () {
+        this.oModifiers = new Object();
+    }
+});
 
-function Card_Door() {
-    
-}
+var Card_Monster = Card_Door.extend({
+    init: function (STR, LVL, GOLD, UNDEAD) {
+        this._super();  //call the parent's constructor
+        this.nStrength = STR;
+        this.nLevelGain = LVL;
+        this.nTreasureGain = GOLD;
+        this.bZombie = (typeof UNDEAD === "undefined") ? false : UNDEAD;
+    }
+});
+//Card_Monster.inherits(Card_Door);
 
-function Card_Monster(STR,LVL,GOLD) {
-    this.nStrength = STR;
-    this.nLevelGain = LVL;
-    this.nTreasureGain = GOLD;
-    this.BadStuff = new Object();
-}
-Card_Monster.inherits(Card_Door);
 
+var Card_Treasure = Class.extend({
+    init: function () {
+        this.nGoldVal = 0;
+    }
+});
 
-function Card_Treasure() {
-    this.nGoldVal = 0;
-}
-
-function Card_Equip(SLOT,BONUS) {
-    this.Slot = SLOT;
-    this.nBonus = BONUS;
-}
-Card_Equip.inherits(Card_Treasure);
+var Card_Equip = Card_Treasure.extend({
+    init: function (SLOT, BONUS) {
+        this._super();
+        this.Slot = SLOT;
+        this.nBonus = BONUS;
+    }
+});
+//Card_Equip.inherits(Card_Treasure);
 
