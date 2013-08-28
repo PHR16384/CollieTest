@@ -1,0 +1,10 @@
+Node.js/Socket.io tutorial:
+http://www.danielnill.com/blog/nodejs-tutorial-with-socketio/
+
+io.sockets.on info:
+http://stackoverflow.com/questions/14751596/socket-io-cannot-call-on
+
+Node-MySql info:
+https://github.com/felixge/node-mysql
+
+
