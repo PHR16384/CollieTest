@@ -2,6 +2,14 @@ $(document).ready(function () {
 
     //document.writeln(navigator.userAgent);
     $("#DEBUG").prepend("<p />" + navigator.userAgent);
+    
+
+    // raw HTML5 audio?
+    var sndPaper = new Audio("./Sound/item_paper_pickup.wav");
+    alert( (new Audio()).canPlayType("audio/x-wav") );
+
+
+    // create Collie layers:
 
     var W = 1024;
     var H = 768;
@@ -176,25 +184,40 @@ $(document).ready(function () {
     })
         .text("New Game")
         .attach({
-            "click": showGameBoard
+            "click": function (e) {
+                sndPaper.play();
+                showGameBoard(e);
+            }
         })
         .addTo(TitleText);
 
     var btnJoinGame = btnNewGame.clone()
         .text("Join Game")
+        .attach({
+            "click": function (e) {
+                sndPaper.play();
+                //joinGame(e);
+            }
+        })
         .addTo(btnNewGame);
 
     var btnRules = btnNewGame.clone()
-        .text("Rules")
+        .text("How to Play")
         .attach({
-            "click": showRules
+            "click": function (e) {
+                sndPaper.play();
+                showRules(e);
+            }
         })
         .addTo(btnJoinGame);
 
     var btnCredits = btnNewGame.clone()
         .text("Credits")
         .attach({
-            "click": showCredits
+            "click": function (e) {
+                sndPaper.play();
+                showCredits(e);
+            }
         })
         .addTo(btnRules);
     //
@@ -270,7 +293,10 @@ $(document).ready(function () {
         padding: "56px 0 0 0"
     }).text("Main Menu")
         .attach({
-            "click": showMainMenu
+            "click": function (e) {
+                sndPaper.play();
+                showMainMenu(e);
+            }
         })
         .addTo(Credits);
     //
@@ -289,7 +315,10 @@ $(document).ready(function () {
         .text("Main Menu")
         //.detachAll()
         .attach({
-            "click": showMainMenu
+            "click": function (e) {
+                sndPaper.play();
+                showMainMenu(e);
+            }
         })
         .addTo(Rules);
 

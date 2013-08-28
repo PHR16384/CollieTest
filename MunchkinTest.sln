@@ -1,50 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "MunchkinClient(1)", "http://localhost:63011", "{1FBE8D62-83B4-4DB7-BBC4-252E082DCC58}"
-	ProjectSection(WebsiteProperties) = preProject
-		UseIISExpress = "true"
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_63011"
-		Debug.AspNetCompiler.PhysicalPath = "MunchkinClient\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_63011\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_63011"
-		Release.AspNetCompiler.PhysicalPath = "MunchkinClient\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_63011\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		SlnRelativePath = "MunchkinClient\"
-		DefaultWebSiteLanguage = "Visual C#"
-	EndProjectSection
-EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "MunchkinServer", "http://localhost:63028", "{C9748EA0-BE02-493E-94E8-74ED4D2E1C36}"
-	ProjectSection(WebsiteProperties) = preProject
-		UseIISExpress = "true"
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_63028"
-		Debug.AspNetCompiler.PhysicalPath = "MunchkinServer\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_63028\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_63028"
-		Release.AspNetCompiler.PhysicalPath = "MunchkinServer\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_63028\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		SlnRelativePath = "MunchkinServer\"
-		DefaultWebSiteLanguage = "Visual C#"
-	EndProjectSection
-EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Tom", "http://localhost:63294", "{2900A1EF-443F-480E-AA86-C85DCFFAAC73}"
 	ProjectSection(WebsiteProperties) = preProject
 		UseIISExpress = "true"
@@ -111,21 +67,65 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Dustin", "http://localhost:
 		DefaultWebSiteLanguage = "Visual C#"
 	EndProjectSection
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "!MunchkinClient", "http://localhost:43122", "{70493BB6-D1BE-43B1-97C9-9893C038BBAF}"
+	ProjectSection(WebsiteProperties) = preProject
+		UseIISExpress = "true"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_43122"
+		Debug.AspNetCompiler.PhysicalPath = "!MunchkinClient\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_43122\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_43122"
+		Release.AspNetCompiler.PhysicalPath = "!MunchkinClient\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_43122\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		SlnRelativePath = "!MunchkinClient\"
+		DefaultWebSiteLanguage = "Visual C#"
+	EndProjectSection
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "!MunchkinServer", "http://localhost:43125", "{B2BA20C8-9F68-43E9-A5F6-09E28F17AE7F}"
+	ProjectSection(WebsiteProperties) = preProject
+		UseIISExpress = "true"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_43125"
+		Debug.AspNetCompiler.PhysicalPath = "!MunchkinServer\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_43125\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_43125"
+		Release.AspNetCompiler.PhysicalPath = "!MunchkinServer\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_43125\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		SlnRelativePath = "!MunchkinServer\"
+		DefaultWebSiteLanguage = "Visual C#"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1FBE8D62-83B4-4DB7-BBC4-252E082DCC58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1FBE8D62-83B4-4DB7-BBC4-252E082DCC58}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C9748EA0-BE02-493E-94E8-74ED4D2E1C36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C9748EA0-BE02-493E-94E8-74ED4D2E1C36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2900A1EF-443F-480E-AA86-C85DCFFAAC73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2900A1EF-443F-480E-AA86-C85DCFFAAC73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86A5203F-9DDD-4D6E-9FF6-AC532AB3F557}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{86A5203F-9DDD-4D6E-9FF6-AC532AB3F557}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77A8B377-2276-4DA5-AA30-8295AE04B3F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{77A8B377-2276-4DA5-AA30-8295AE04B3F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70493BB6-D1BE-43B1-97C9-9893C038BBAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70493BB6-D1BE-43B1-97C9-9893C038BBAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2BA20C8-9F68-43E9-A5F6-09E28F17AE7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2BA20C8-9F68-43E9-A5F6-09E28F17AE7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
