@@ -3,8 +3,16 @@
 <head>
     <script src="Scripts/collie.min.js" type="text/javascript"></script>
     <script src="Scripts/jquery-2.0.3.js" type="text/javascript"></script>
+    <script src="Scripts/Socket.io.js" type="text/javascript"></script>
     <link href="CSS/style.css" rel="stylesheet" type="text/css" />
-    
+    <script type="text/javascript">
+	// Initial socket connect
+    var socket = io.connect('http://munchtest-djt.rhcloud.com');            
+    socket.on('connect', function(){    	
+    	socket.emit('clientId', {'clientId': this.socket.sessionid});
+    	console.log("ClientId = " + this.socket.sessionid); // Grab session ID
+    });    
+    </script>
     <title>Collie Game Test</title>
 </head>
 <body>
@@ -27,7 +35,7 @@
         var MainMenu = new collie.Layer({ width: W, height: H });
         var gameBoard = new collie.Layer({ width: W, height: H });
         var cardLayer = new collie.Layer({ width: W, height: H });
-        var windowLayer = new collie.Layer({ width: W, height: H });
+        var cardWindowLayer = new collie.Layer({ width: W, height: H });
         var menuLayer = new collie.Layer({ width: W, height: H });
         var Layer1 = new collie.Layer({ width: W, height: H });
         var BG = Layer1.clone();
@@ -64,7 +72,9 @@
             Munchkin: "images/munchkin-1024.png",
             dice: "images/dice.png",
             uI: "images/ui.png",
-            textDropImg: "images/textDropdown.png"
+            textDropImg: "images/textDropdown1.png",
+            gearIcon: "images/gearicon1.png",
+            menuBlock: "images/menublock.png"
         });
 
         collie.ImageManager.addSprite("cardBack", {
@@ -162,7 +172,7 @@
             padding: "16 0 0 0"
         }).text("\u00A92013 [Dev. Group Name Here]").addTo(TitleText);
 
-        var nBTN_V_MM = 72; //NOTE: cannot "stack" items w/ events listeners; events will bubble along parent/child tree
+        var nBTN_V_MM = 72; 
 
         var btnNewGame = new collie.Text({
             //x: 0,
@@ -190,7 +200,9 @@
             fontColor: "rgb(64,32,0)",
             fontSize: 40,
             padding: "38 0 0 0"
-        }).text("Join Game").addTo(TitleText);
+        }).text("Join Game").attach({
+            "click": showGameBoard
+        }).addTo(TitleText);
 
         var btnRules = new collie.Text({
             //x: 0,
@@ -342,12 +354,21 @@
         }
 
         function showGameBoard(e) {
-           
-        collie.Renderer.removeAllLayer();
-        collie.Renderer.addLayer(BG);
-        collie.Renderer.addLayer(gameBoard);
-        collie.Renderer.addLayer(cardLayer);
+        	
+           	// Initial connection to room - Currently static to room 'test'
+        	socket.emit('subscribe', 'test');
+           	
+            collie.Renderer.removeAllLayer();
+            collie.Renderer.addLayer(BG);
+            collie.Renderer.addLayer(gameBoard);
+            collie.Renderer.addLayer(cardLayer);
 
+            // Listener for the door cards
+	        socket.on('cardDrawnDoor', function(data){
+	        	var cardDrawn = data;
+	        	drawDoor(null,cardDrawn);
+	        });
+            
             var oDoorBack = new collie.DisplayObject({
                 x: 358,
                 y: 197,
@@ -356,9 +377,17 @@
                 spriteSheet: "doorBack",
                 backgroundImage: "cardBack"
             }).addTo(cardLayer).attach({
-                "click": drawDoor
+                "click": function(e) {
+                	drawDoor(e);
+                }
             });
-
+			
+            // Listener for the treasure cards
+            socket.on('cardDrawnTreasure', function(data){
+            	var cardDrawn = data;
+            	drawTreasure(null,cardDrawn);
+            });
+            
             var oTreasureBack = new collie.DisplayObject({
                 x: 504,
                 y: 197,
@@ -367,28 +396,70 @@
                 spriteSheet: "treasureBack",
                 backgroundImage: "cardBack"
             }).addTo(cardLayer).attach({
-                "click": drawTreasure
+                "click": function(e) {
+                	drawTreasure(e);
+                }
             });
 
             var oUiElement = new collie.DisplayObject({
                 x: 0,
                 y: 0,
                 backgroundImage: "uI"
-            }).addTo(gameBoard).attach({
-                "click": equipmentWindow
-            });
+            }).addTo(gameBoard);
 
-            var textDrop = new collie.DisplayObject({
+            var chatDrop = new collie.DisplayObject({
                 x: -35,
                 y: -180,
                 width: 325,
                 height: 218,
                 backgroundImage: "textDropImg"
-            }).addTo(gameBoard).attach({
-            "click": openTextBox
+            }).addTo(gameBoard);
+
+            var btnOpenChatWindow = new collie.Text({
+                x: 80,
+                y: -5,
+                width: 100,
+                textAlign: "center",
+                fontFamily: "Quasi",
+                fontColor: "rgb(0,0,20)",
+                fontSize: 18,
+                fontWeight: "Bold",
+                padding: "32 0 0 0"
+            }).text("").addTo(gameBoard).attach({
+                "click": openTextBox
             });
 
-           var oDie = new collie.DisplayObject({
+            var btnCloseChatWindow = new collie.Text({
+                x: 235,
+                y: -185,
+                width: 15,
+                textAlign: "center",
+                fontFamily: "Quasi",
+                fontColor: "rgb(0,0,20)",
+                fontWeight: "bold",
+                fontSize: 15,
+                padding: "32 0 0 0"
+            }).text("X").addTo(gameBoard).attach({
+                "click": closeTextBox
+            });
+
+            var btnOpenMenuWindow = new collie.DisplayObject({
+                x: 815,
+                y: -5,
+                width: 100,
+                height: 52,
+                backgroundImage: "menuBlock"
+            }).addTo(gameBoard).attach({
+                "click": menuWindow
+            });
+
+            //Listener for the dice rool
+            socket.on('rolledDie', function(data){
+               	var dieRolled = data;
+               	rollDie(null,dieRolled);
+            }); 
+            
+            var oDie = new collie.DisplayObject({
                 x: 900,
                 y: 645,
                 width: 146,
@@ -399,19 +470,64 @@
                 spriteX: 0,
                 backgroundImage: "dice"
             }).addTo(gameBoard).attach({
-                "click": rollDie
+                "click": function(e){
+                	rollDie(e);
+                }
             });
 
+            var oGearIcon = new collie.DisplayObject({
+                x: 15,
+                y: 680,
+                width: 86,
+                height: 86,
+                backgroundImage: "gearIcon"
+            }).addTo(gameBoard);
+
             function openTextBox(e) {
-                collie.Timer.transition(textDrop, 300, {
+                e.stop();
+                collie.Timer.transition(chatDrop, 300, {
                     from: [-35, -180], 
                     to: [-35, 0],
                     set: ["x", "y"]
-                });              
+                });
+                collie.Timer.transition(btnOpenChatWindow, 300, {
+                    from: [80, -5],
+                    to: [80, 175],
+                    set: ["x", "y"]
+                });
+                collie.Timer.transition(btnCloseChatWindow, 300, {
+                    from: [235, -185],
+                    to: [235, -5],
+                    set: ["x", "y"]
+                });
+
             };
-                      
-            function rollDie(e) {
-                var dieRand = Math.round(Math.random() * 6);
+            
+            function closeTextBox(e) {
+                e.stop();
+                collie.Timer.transition(chatDrop, 300, {
+                    from: [-35, 0],
+                    to: [-35, -180],
+                    set: ["x", "y"]
+                });
+                collie.Timer.transition(btnOpenChatWindow, 300, {
+                    from: [80, 175],
+                    to: [80, -5],
+                    set: ["x", "y"]
+                });
+                collie.Timer.transition(btnCloseChatWindow, 300, {
+                    from: [235, -5],
+                    to: [235, -185],
+                    set: ["x", "y"]
+                });
+            };
+
+            function rollDie(e, dieRolled) {
+                //e.stop();
+                var dieRand = dieRolled || Math.round(Math.random() * 6);
+                if(!dieRolled){
+            		socket.emit('dieRoll', {'die': dieRand});
+            	}
                 var newDieRoll = new collie.DisplayObject({
                     x: 900,
                     y: 645,
@@ -427,8 +543,12 @@
                 });
             };
 
-            function drawDoor(e) {
-                var nRand = Math.round(Math.random() * 95);
+            function drawDoor(e, drawDoorCard) {
+                //e.stop();
+                var nRand = drawDoorCard || Math.round(Math.random() * 95);
+                if(!drawDoorCard){
+            		socket.emit('drawDoor', {'card': nRand});
+            	}
                 //console.log(nRand);
                 $("#DEBUG").text(nRand + ": " + Math.floor(nRand / 19) + ", " + nRand % 19);
 
@@ -443,12 +563,16 @@
                     spriteX: nRand % 19,
                     backgroundImage: "doorCards"
                 }).addTo(cardLayer).attach({
-                    "click": windowOpen
+                    "click": cardWindowOpen
                 });
             };
 
-            function drawTreasure(e) {
-                var nRand = Math.round(Math.random() * 73);
+            function drawTreasure(e, drawTreasureCard) {
+                //e.stop();
+                var nRand = drawTreasureCard || Math.round(Math.random() * 73);
+                if(!drawTreasureCard){
+            		socket.emit('drawTreasure', {'card': nRand});
+            	}
                 //console.log(nRand);
                 $("#DEBUG").text(nRand + ": " + Math.floor(nRand / 25) + ", " + nRand % 25);
 
@@ -463,13 +587,14 @@
                     spriteX: nRand % 25,
                     backgroundImage: "treasureCards"
                 }).addTo(cardLayer).attach({
-                    "click": windowOpen
+                    "click": cardWindowOpen
                 });
             };
 
-            function windowOpen(e) {
+            function cardWindowOpen(e) {
+                e.stop();
                 collie.Renderer.removeLayer(cardLayer);
-                collie.Renderer.addLayer(windowLayer);
+                collie.Renderer.addLayer(cardWindowLayer);
 
                 var oWindow = new collie.DisplayObject({
                     x: 220,
@@ -477,14 +602,35 @@
                     width: 600,
                     height: 400,
                     backgroundImage: "cardWindow"
-                }).addTo(windowLayer);
+                }).addTo(cardWindowLayer);
+
+                var btnCloseCardWindow = new collie.Text({
+                    x: 715,
+                    y: 200,
+                    width: 10,
+                    textAlign: "center",
+                    fontFamily: "Quasi",
+                    fontColor: "rgb(255,255,192)",
+                    fontWeight: "bold",
+                    fontSize: 15,
+                    padding: "32 0 0 0"
+                }).text("X").addTo(cardWindowLayer).attach({
+                    "click": closeCardWindow
+                });
             };
 
-            function equipmentWindow(e) {
+            function closeCardWindow(e) {
+                e.stop();
+                collie.Renderer.removeLayer(cardWindowLayer);
+                collie.Renderer.addLayer(cardLayer);
+            };
+
+            function menuWindow(e) {
+                e.stop();
                 collie.Renderer.removeLayer(cardLayer);
                 collie.Renderer.addLayer(menuLayer);
 
-                var oEquipmentWindow = new collie.DisplayObject({
+                var omenuWindow = new collie.DisplayObject({
                     x: 0,
                     y: 0,
                     width: W,

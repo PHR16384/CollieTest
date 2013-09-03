@@ -1,0 +1,716 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <script src="Scripts/collie.min.js" type="text/javascript"></script>
+    <script src="Scripts/jquery-2.0.3.js" type="text/javascript"></script>
+    <script src="Scripts/Socket.io.js" type="text/javascript"></script>
+    <link href="CSS/style.css" rel="stylesheet" type="text/css" />
+    <script>
+	// Initial socket connect
+    var socket = io.connect('http://munchtest-djt.rhcloud.com');            
+    socket.on('connect', function(){    	
+    	socket.emit('clientId', {'clientId': this.socket.sessionid});
+    	console.log("ClientId = " + this.socket.sessionid); // Grab session ID
+    });    
+    </script>
+    <title>Collie Game Test</title>
+</head>
+<body>
+
+<div id="gameCanvas" class="canvas"></div>
+
+<div id="DEBUG"></div>
+
+
+<script type="text/javascript">
+        
+        //card and canvas size variables
+        var W = 1024;
+        var H = 768;
+        var cardW = 126;
+        var cardH = 196;
+
+        //Layers
+        var TitleScreen = new collie.Layer({ width: W, height: H });
+        var MainMenu = new collie.Layer({ width: W, height: H });
+        var gameBoard = new collie.Layer({ width: W, height: H });
+        var cardLayer = new collie.Layer({ width: W, height: H });
+        var cardWindowLayer = new collie.Layer({ width: W, height: H });
+        var menuLayer = new collie.Layer({ width: W, height: H });
+        var Layer1 = new collie.Layer({ width: W, height: H });
+        var BG = Layer1.clone();
+        var TitleScreen = Layer1.clone();
+
+        var TitleText = new collie.Layer({
+            x: W / 2,
+            y: 112,
+            width: W / 2,
+            height: 768
+        });
+
+        var Credits = new collie.Layer({
+            x: W * 0.4,
+            y: 160,
+            width: W * 0.6,
+            height: 500
+        });
+
+        var Rules = Credits.clone();
+
+        var GameBoard = Layer1.clone();
+
+
+        //Add Images and sprites to Image Manager
+        collie.ImageManager.add({
+            background: "images/large-floor-01.jpg",
+            doorCards: "images/door_spritesheet.png",
+            treasureCards: "images/treasure_spritesheet.png",
+            paperBg: "images/background_final.jpg",
+            cardBack: "images/card_backs.png",
+            window: "images/window.png",
+            cardWindow: "images/cardwindow.png",
+            Munchkin: "images/munchkin-1024.png",
+            dice: "images/dice.png",
+            uI: "images/ui.png",
+            textDropImg: "images/textDropdown.png",
+            gearIcon: "images/gearicon1.png"
+        });
+
+        collie.ImageManager.addSprite("cardBack", {
+            treasureBack: [0, 0, cardW, cardH, 1],
+            doorBack: [cardW, 0, cardW, cardH, 1]
+        });
+
+        collie.ImageManager.addSprite("dice", {
+        });
+
+        collie.ImageManager.addSprite("doorCards", {
+           
+        });
+        collie.ImageManager.addSprite("treasureCards", {
+
+        });
+
+        collie.Renderer.addLayer(BG);
+        collie.Renderer.addLayer(TitleText);
+        collie.Renderer.addLayer(TitleScreen);
+        collie.Renderer.addLayer(gameBoard);
+        collie.Renderer.addLayer(cardLayer);
+
+        collie.Renderer.load(document.getElementById("gameCanvas"));
+        collie.Renderer.start();
+
+
+        //BG Objects
+
+        var oBg = new collie.DisplayObject({
+            x: 0,
+            y: 0,
+            backgroundImage: "paperBg"
+        }).addTo(BG);
+
+        // Title Screen Objects
+
+        var txtTitle = new collie.Text({
+            x: "center",
+            y: 0,
+            width: W,
+            scaleX: 1,
+            textAlign: "center",
+            //textBaseline: "alphabetic",
+            fontFamily: "Quasi",
+            fontColor: "rgb(64,32,0)",
+            fontSize: 108,
+            padding: "96 0 0 0"
+        }).text("Munchkin").addTo(TitleScreen);
+
+        var txtTM = new collie.Text({
+            x: 800,
+            y: 12,
+            width: 76,
+            fontFamily: "serif",
+            fontColor: "rgb(64,32,0)",
+            fontWeight: "bold",
+            fontSize: 12,
+            padding: "12 0 0 0"
+        }).text("TM").addTo(txtTitle);    // \u00AE
+
+        var txtSubtitle = new collie.Text({
+            x: "center",
+            y: 108,
+            width: W,
+            textAlign: "center",
+            fontFamily: "Quasi",
+            fontColor: "rgb(64,32,0)",
+            fontStyle: "italic",
+            fontSize: 18,
+            padding: "18 0 0 0"
+        }).text("Kill the Monsters * Steal the Treasure * Stab Your Buddy").addTo(TitleScreen);
+
+        var imgMunchkin = new collie.DisplayObject({
+            x: 10,
+            y: 112,
+            width: 504,
+            height: 648,
+            backgroundImage: "Munchkin"
+        }).addTo(TitleScreen);
+        //
+
+
+        // Title Text/Buttons:
+
+        var txtCopyright = new collie.Text({
+            x: "right",
+            y: "bottom",
+            width: 320,
+            //textAlign: "right",
+            fontFamily: "Quasi",
+            fontColor: "rgb(64,32,0)",
+            fontWeight: "bold",
+            fontSize: 16,
+            padding: "16 0 0 0"
+        }).text("\u00A92013 [Dev. Group Name Here]").addTo(TitleText);
+
+        var nBTN_V_MM = 72; 
+
+        var btnNewGame = new collie.Text({
+            //x: 0,
+            y: nBTN_V_MM,
+            width: 320,
+            height: 48,
+            backgroundColor: "rgba(255,255,192,0.6)",
+            textAlign: "center",
+            fontFamily: "Quasi",
+            fontColor: "rgb(64,32,0)",
+            fontSize: 40,
+            padding: "38 0 0 0"
+        }).text("New Game").attach({
+            "click": showGameBoard
+        }).addTo(TitleText);
+
+        var btnJoinGame = new collie.Text({
+            //x: 0,
+            y: nBTN_V_MM * 2,
+            width: 320,
+            height: 48,
+            backgroundColor: "rgba(255,255,192,0.6)",
+            textAlign: "center",
+            fontFamily: "Quasi",
+            fontColor: "rgb(64,32,0)",
+            fontSize: 40,
+            padding: "38 0 0 0"
+        }).text("Join Game").attach({
+            "click": showGameBoard
+        }).addTo(TitleText);
+
+        var btnRules = new collie.Text({
+            //x: 0,
+            y: nBTN_V_MM * 3,
+            width: 320,
+            height: 48,
+            backgroundColor: "rgba(255,255,192,0.6)",
+            textAlign: "center",
+            fontFamily: "Quasi",
+            fontColor: "rgb(64,32,0)",
+            fontSize: 40,
+            padding: "38 0 0 0"
+        }).text("Rules").attach({
+            "click": showRules
+        }).addTo(TitleText);
+
+        var btnCredits = new collie.Text({
+            //x: 0,
+            y: nBTN_V_MM * 4,
+            width: 320,
+            height: 48,
+            backgroundColor: "rgba(255,255,192,0.6)",
+            textAlign: "center",
+            fontFamily: "Quasi",
+            fontColor: "rgb(64,32,0)",
+            fontSize: 40,
+            padding: "38 0 0 0"
+        }).text("Credits").attach({
+            "click": showCredits
+        }).addTo(TitleText);
+        
+        // Credits
+
+        var txtCredit = new collie.Text({
+            x: "center",
+            y: 50,
+            width: 480,
+            textAlign: "center",
+            fontFamily: "Quasi",
+            fontColor: "rgb(64,32,0)",
+            fontSize: 20,
+            padding: "20 0 0 0"
+        }).text("Original Game Design by").addTo(Credits);
+
+        var txtCreditA1 = new collie.Text({
+            x: 0,
+            y: 24,
+            width: 480,
+            textAlign: "center",
+            fontFamily: "Quasi",
+            fontColor: "rgb(64,32,0)",
+            fontWeight: "bold",
+            fontSize: 32,
+            padding: "32 0 0 0"
+        }).text("Steve Jackson").addTo(txtCredit);
+
+        var txtCreditB = new collie.Text({
+            x: 0,
+            y: 90,
+            width: 480,
+            textAlign: "center",
+            fontFamily: "Quasi",
+            fontColor: "rgb(64,32,0)",
+            fontSize: 20,
+            padding: "20 0 0 0"
+        }).text("Illustrations by").addTo(txtCredit);
+
+        // "clone()" duplicates the attributes of an object.  I can use this to copypasta relative positioning attr., to "stack" text objects:
+        var txtCreditB1 = txtCreditA1.clone().text("John Kovalic").addTo(txtCreditB);
+
+        var txtCreditC = new collie.Text({
+            x: 0,
+            y: 180,
+            width: 480,
+            textAlign: "center",
+            fontFamily: "Quasi",
+            fontColor: "rgb(64,32,0)",
+            fontSize: 20,
+            padding: "20 0 0 0"
+        }).text("JavaScript Port designed + coded by").addTo(txtCredit);
+
+        var txtCreditC1 = txtCreditB1.clone().text("Dustin Duffy").addTo(txtCreditC);
+
+        var txtCreditC2 = new collie.Text({
+            x: 0,
+            y: 36,
+            width: 480,
+            textAlign: "center",
+            fontFamily: "Quasi",
+            fontColor: "rgb(64,32,0)",
+            fontWeight: "bold",
+            fontSize: 32,
+            padding: "32 0 0 0"
+        }).text("Tom Kruk").addTo(txtCreditC1);
+
+        var txtCreditC3 = txtCreditC2.clone().text("John Prinz").addTo(txtCreditC2);
+
+        var btnMainMenu = new collie.Text({
+            x: "center",
+            y: "bottom",
+            width: 320,
+            height: 48,
+            backgroundColor: "rgba(255,255,192,0.6)",
+            textAlign: "center",
+            fontFamily: "Quasi",
+            fontColor: "rgb(64,32,0)",
+            fontSize: 40,
+            padding: "38 0 0 0"
+        }).text("Main Menu").attach({
+            "click": showMainMenu
+        }).addTo(Credits);
+       
+       // DA RULES.
+
+        var imgRULES = new collie.DisplayObject({
+            x: "center",
+            y: "center",
+            width: 347,
+            height: 266,
+            backgroundImage: "DA_RULES"
+        }).addTo(Rules);
+
+        var btnMainMenu2 = btnMainMenu.clone()
+        .text("Main Menu")
+        //.detachAll()
+        .attach({
+        "click": showMainMenu
+    }).addTo(Rules);
+
+
+      
+        //Game board Objects
+         
+        function showMainMenu(e) {
+            collie.Renderer.removeAllLayer();
+            collie.Renderer.addLayer(BG);
+            collie.Renderer.addLayer(TitleScreen);
+            collie.Renderer.addLayer(TitleText);
+        }
+
+        function showCredits(e) {
+            collie.Renderer.removeLayer(TitleText);
+            collie.Renderer.addLayer(Credits);
+        }
+
+        function showRules(e) {
+            collie.Renderer.removeLayer(TitleText);
+            collie.Renderer.addLayer(Rules);
+        }
+
+        function showGameBoard(e) {
+        	
+           	// Initial connection to room - Currently static to room 'test'
+        	socket.emit('subscribe', 'test');
+           	
+            collie.Renderer.removeAllLayer();
+            collie.Renderer.addLayer(BG);
+            collie.Renderer.addLayer(gameBoard);
+            collie.Renderer.addLayer(cardLayer);
+
+            // Listener for the door cards
+	        socket.on('cardDrawnDoor', function(data){
+	        	var cardDrawn = data;
+	        	drawDoor(null,cardDrawn);
+	        });
+            
+            var oDoorBack = new collie.DisplayObject({
+                x: 358,
+                y: 197,
+                width: cardW,
+                height: cardH,
+                spriteSheet: "doorBack",
+                backgroundImage: "cardBack"
+            }).addTo(cardLayer).attach({
+                "click": function(e) {
+                	drawDoor(e);
+                }
+            });
+			
+            // Listener for the treasure cards
+            socket.on('cardDrawnTreasure', function(data){
+            	var cardDrawn = data;
+            	drawTreasure(null,cardDrawn);
+            });
+            
+            var oTreasureBack = new collie.DisplayObject({
+                x: 504,
+                y: 197,
+                width: cardW,
+                height: cardH,
+                spriteSheet: "treasureBack",
+                backgroundImage: "cardBack"
+            }).addTo(cardLayer).attach({
+                "click": function(e) {
+                	drawTreasure(e);
+                }
+            });
+
+            var oUiElement = new collie.DisplayObject({
+                x: 0,
+                y: 0,
+                backgroundImage: "uI"
+            }).addTo(gameBoard);
+
+            var chatDrop = new collie.DisplayObject({
+                x: -35,
+                y: -180,
+                width: 325,
+                height: 218,
+                backgroundImage: "textDropImg"
+            }).addTo(gameBoard);
+
+            var btnOpenChatWindow = new collie.Text({
+                x: 80,
+                y: -5,
+                width: 100,
+                textAlign: "center",
+                fontFamily: "Quasi",
+                fontColor: "rgb(0,0,20)",
+                fontSize: 18,
+                fontWeight: "Bold",
+                padding: "32 0 0 0"
+            }).text("Chat").addTo(gameBoard).attach({
+                "click": openTextBox
+            });
+
+            var btnCloseChatWindow = new collie.Text({
+                x: 235,
+                y: -185,
+                width: 15,
+                textAlign: "center",
+                fontFamily: "Quasi",
+                fontColor: "rgb(0,0,20)",
+                fontWeight: "bold",
+                fontSize: 15,
+                padding: "32 0 0 0"
+            }).text("X").addTo(gameBoard).attach({
+                "click": closeTextBox
+            });
+
+            var btnOpenMenuWindow = new collie.Text({
+                x: 815,
+                y: -8,
+                width: 100,
+                textAlign: "center",
+                fontFamily: "Quasi",
+                fontColor: "rgb(0,0,20)",
+                fontSize: 18,
+                fontWeight: "Bold",
+                padding: "32 0 0 0"
+            }).text("Menu").addTo(gameBoard).attach({
+                "click": menuWindow
+            });
+
+            //Listener for the dice rool
+            socket.on('rolledDie', function(data){
+               	var dieRolled = data;
+               	rollDie(null,dieRolled);
+            }); 
+            
+            var oDie = new collie.DisplayObject({
+                x: 900,
+                y: 645,
+                width: 146,
+                height: 146,
+                scaleX: 0.5,
+                scaleY: 0.5,
+                spriteY: 0,
+                spriteX: 0,
+                backgroundImage: "dice"
+            }).addTo(gameBoard).attach({
+                "click": function(e){
+                	rollDie(e);
+                }
+            });
+
+            var oGearIcon = new collie.DisplayObject({
+                x: 15,
+                y: 680,
+                width: 86,
+                height: 86,
+                backgroundImage: "gearIcon"
+            }).addTo(gameBoard);
+
+            function openTextBox(e) {
+                e.stop();
+                collie.Timer.transition(chatDrop, 300, {
+                    from: [-35, -180], 
+                    to: [-35, 0],
+                    set: ["x", "y"]
+                });
+                collie.Timer.transition(btnOpenChatWindow, 300, {
+                    from: [80, -5],
+                    to: [80, 175],
+                    set: ["x", "y"]
+                });
+                collie.Timer.transition(btnCloseChatWindow, 300, {
+                    from: [235, -185],
+                    to: [235, -5],
+                    set: ["x", "y"]
+                });
+
+            };
+            
+            function closeTextBox(e) {
+                e.stop();
+                collie.Timer.transition(chatDrop, 300, {
+                    from: [-35, 0],
+                    to: [-35, -180],
+                    set: ["x", "y"]
+                });
+                collie.Timer.transition(btnOpenChatWindow, 300, {
+                    from: [80, 175],
+                    to: [80, -5],
+                    set: ["x", "y"]
+                });
+                collie.Timer.transition(btnCloseChatWindow, 300, {
+                    from: [235, -5],
+                    to: [235, -185],
+                    set: ["x", "y"]
+                });
+            };
+
+            function rollDie(e, dieRolled) {
+                //e.stop();
+                var dieRand = dieRolled || Math.round(Math.random() * 6);
+                if(!dieRolled){
+            		socket.emit('dieRoll', {'die': dieRand});
+            	}
+                var newDieRoll = new collie.DisplayObject({
+                    x: 900,
+                    y: 645,
+                    scaleX: 0.5,
+                    scaleY: 0.5,
+                    width: 146,
+                    height: 146,
+                    spriteY: 0,
+                    spriteX: dieRand,
+                    backgroundImage: "dice"
+                }).addTo(gameBoard).attach({
+                    "click": rollDie
+                });
+            };
+
+            function drawDoor(e, drawDoorCard) {
+                //e.stop();
+                var nRand = drawDoorCard || Math.round(Math.random() * 95);
+                if(!drawDoorCard){
+            		socket.emit('drawDoor', {'card': nRand});
+            	}
+                //console.log(nRand);
+                $("#DEBUG").text(nRand + ": " + Math.floor(nRand / 19) + ", " + nRand % 19);
+
+                var doorCard1 = new collie.DisplayObject({
+                    x: 233,
+                    y: 200,
+                    width: cardW,
+                    height: cardH,
+                    scaleX: 0.85,
+                    scaleY: 0.85,
+                    spriteY: Math.floor(nRand / 19),
+                    spriteX: nRand % 19,
+                    backgroundImage: "doorCards"
+                }).addTo(cardLayer).attach({
+                    "click": cardWindowOpen
+                });
+            };
+
+            function drawTreasure(e, drawTreasureCard) {
+                //e.stop();
+                var nRand = drawTreasureCard || Math.round(Math.random() * 73);
+                if(!drawTreasureCard){
+            		socket.emit('drawTreasure', {'card': nRand});
+            	}
+                //console.log(nRand);
+                $("#DEBUG").text(nRand + ": " + Math.floor(nRand / 25) + ", " + nRand % 25);
+
+                var treasureCard1 = new collie.DisplayObject({
+                    x: 630,
+                    y: 200,
+                    width: cardW,
+                    height: cardH,
+                    scaleX: 0.85,
+                    scaleY: 0.85,
+                    spriteY: Math.floor(nRand / 25),
+                    spriteX: nRand % 25,
+                    backgroundImage: "treasureCards"
+                }).addTo(cardLayer).attach({
+                    "click": cardWindowOpen
+                });
+            };
+
+            function cardWindowOpen(e) {
+                e.stop();
+                collie.Renderer.removeLayer(cardLayer);
+                collie.Renderer.addLayer(cardWindowLayer);
+
+                var oWindow = new collie.DisplayObject({
+                    x: 220,
+                    y: 150,
+                    width: 600,
+                    height: 400,
+                    backgroundImage: "cardWindow"
+                }).addTo(cardWindowLayer);
+
+                var btnCloseCardWindow = new collie.Text({
+                    x: 715,
+                    y: 200,
+                    width: 10,
+                    textAlign: "center",
+                    fontFamily: "Quasi",
+                    fontColor: "rgb(255,255,192)",
+                    fontWeight: "bold",
+                    fontSize: 15,
+                    padding: "32 0 0 0"
+                }).text("X").addTo(cardWindowLayer).attach({
+                    "click": closeCardWindow
+                });
+            };
+
+            function closeCardWindow(e) {
+                e.stop();
+                collie.Renderer.removeLayer(cardWindowLayer);
+                collie.Renderer.addLayer(cardLayer);
+            };
+
+            function menuWindow(e) {
+                e.stop();
+                collie.Renderer.removeLayer(cardLayer);
+                collie.Renderer.addLayer(menuLayer);
+
+                var omenuWindow = new collie.DisplayObject({
+                    x: 0,
+                    y: 0,
+                    width: W,
+                    height: H,
+                    backgroundImage: "window"
+                }).addTo(menuLayer);
+
+                //In game menu
+
+                var btnMenu = new collie.Text({
+                    x: 352,
+                    y: 200,
+                    width: 320,
+                    height: 48,
+                    backgroundColor: "rgba(0,0,0,0)",
+                    textAlign: "center",
+                    fontFamily: "Quasi",
+                    fontColor: "rgba(255,255,192,1)",
+                    fontSize: 40,
+                    padding: "38 0 0 0"
+                }).text("Main Menu").attach({
+                    "click": showMainMenu
+                }).addTo(menuLayer);
+
+                var btnOptions = new collie.Text({
+                    x: 352,
+                    y: 300,
+                    width: 320,
+                    height: 48,
+                    backgroundColor: "rgba(0,0,0,0)",
+                    textAlign: "center",
+                    fontFamily: "Quasi",
+                    fontColor: "rgba(255,255,192,1)",
+                    fontSize: 40,
+                    padding: "38 0 0 0"
+                }).text("Options").attach({
+                    "click": showMainMenu
+                }).addTo(menuLayer);
+
+                var btnQuitGame = new collie.Text({
+                    x: 352,
+                    y: 400,
+                    width: 320,
+                    height: 48,
+                    backgroundColor: "rgba(0,0,0,0)",
+                    textAlign: "center",
+                    fontFamily: "Quasi",
+                    fontColor: "rgba(255,255,192,1)",
+                    fontSize: 40,
+                    padding: "38 0 0 0"
+                }).text("Quit Game").attach({
+                    "click": showCredits
+                }).addTo(menuLayer);
+
+                var btnCloseWindow = new collie.Text({
+                    x: 352,
+                    y: 500,
+                    width: 320,
+                    height: 48,
+                    backgroundColor: "rgba(0,0,0,0)",
+                    textAlign: "center",
+                    fontFamily: "Quasi",
+                    fontColor: "rgba(255,255,192,1)",
+                    fontSize: 40,
+                    padding: "38 0 0 0"
+                }).text("Back to Game").attach({
+                    "click": showGameBoard
+                }).addTo(menuLayer);
+            };
+        }
+        
+
+
+
+
+        
+</script>
+
+</body>
+</html>
